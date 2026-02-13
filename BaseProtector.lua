@@ -1,261 +1,185 @@
---// 💜 Sprizan Base Protector - Neon Edition
+--// ==============================
+-- SPRIZAN BASE PROTECTOR (FIXED)
+-- ==============================
 
+if not game:IsLoaded() then
+	game.Loaded:Wait()
+end
+
+repeat task.wait() until game.Players.LocalPlayer
+
+print("⚡ Sprizan Base Protector Loaded")
+
+--// SERVICES
 local Players = game:GetService("Players")
+local TweenService = game:GetService("TweenService")
 local UIS = game:GetService("UserInputService")
-local RunService = game:GetService("RunService")
 
 local player = Players.LocalPlayer
 local playerGui = player:WaitForChild("PlayerGui")
 
--------------------------------------------------
--- SETTINGS
--------------------------------------------------
+------------------------------------------------
+-- UI
+------------------------------------------------
 
-local ENABLED_COMMANDS = {
-	balloon=true,
-	ragdoll=true,
-	rocket=true,
-	jumpscare=true,
-	inverse=true,
-}
+local gui = Instance.new("ScreenGui", playerGui)
+gui.Name = "SprizanProtector"
+gui.ResetOnSpawn = false
 
-local enabled = false
-local cooldown = false
+local main = Instance.new("Frame", gui)
+main.Size = UDim2.new(0,260,0,150)
+main.Position = UDim2.new(0.5,-130,0.5,-75)
+main.BackgroundColor3 = Color3.fromRGB(15,10,25)
+main.BorderSizePixel = 0
+Instance.new("UICorner", main).CornerRadius = UDim.new(0,14)
 
--------------------------------------------------
--- UI (NEON)
--------------------------------------------------
+local stroke = Instance.new("UIStroke", main)
+stroke.Color = Color3.fromRGB(170,0,255)
+stroke.Thickness = 2
 
-local gui = Instance.new("ScreenGui",playerGui)
-gui.ResetOnSpawn=false
-gui.Name="SprizanProtector"
-
-local frame = Instance.new("Frame",gui)
-frame.Size=UDim2.new(0,270,0,145)
-frame.Position=UDim2.new(0.5,-135,0.5,-70)
-frame.BackgroundColor3=Color3.fromRGB(10,10,15)
-frame.BorderSizePixel=0
-
-Instance.new("UICorner",frame).CornerRadius=UDim.new(0,14)
-
-local stroke=Instance.new("UIStroke",frame)
-stroke.Color=Color3.fromRGB(170,60,255)
-stroke.Thickness=2
-
--- NEON PULSE
-RunService.RenderStepped:Connect(function()
-	local t=tick()*2
-	stroke.Transparency=(math.sin(t)+1)/4
-end)
-
--- TITLE
-local title=Instance.new("TextLabel",frame)
-title.Size=UDim2.new(1,0,0,32)
-title.BackgroundTransparency=1
-title.Font=Enum.Font.GothamBold
-title.Text="🛡️ Sprizan Base Protector"
-title.TextColor3=Color3.fromRGB(220,200,255)
-title.TextSize=15
-
--- DISCORD
-local dc=Instance.new("TextLabel",frame)
-dc.Position=UDim2.new(0,0,0,30)
-dc.Size=UDim2.new(1,0,0,16)
-dc.BackgroundTransparency=1
-dc.Font=Enum.Font.Gotham
-dc.Text="discord.gg/DAA3d7BcPU"
-dc.TextSize=11
-dc.TextColor3=Color3.fromRGB(180,140,255)
-
--- STATUS
-local status=Instance.new("TextLabel",frame)
-status.Position=UDim2.new(0,0,0,55)
-status.Size=UDim2.new(1,0,0,20)
-status.BackgroundTransparency=1
-status.Font=Enum.Font.GothamBold
-status.Text="Status: OFF"
-status.TextColor3=Color3.fromRGB(255,80,80)
-status.TextSize=13
-
--- TOGGLE
-local toggle=Instance.new("TextButton",frame)
-toggle.Size=UDim2.new(0,130,0,36)
-toggle.Position=UDim2.new(0.5,-65,1,-45)
-toggle.BackgroundColor3=Color3.fromRGB(220,38,38)
-toggle.Text="OFF"
-toggle.Font=Enum.Font.GothamBold
-toggle.TextColor3=Color3.new(1,1,1)
-toggle.TextSize=14
-
-Instance.new("UICorner",toggle).CornerRadius=UDim.new(0,10)
-
-local glow=Instance.new("UIStroke",toggle)
-glow.Color=Color3.fromRGB(170,60,255)
-glow.Thickness=2
-
-RunService.RenderStepped:Connect(function()
-	local t=tick()*4
-	glow.Transparency=(math.sin(t)+1)/3
-end)
-
--------------------------------------------------
--- DRAG
--------------------------------------------------
-
-local dragging,dragStart,startPos
-
-frame.InputBegan:Connect(function(input)
-	if input.UserInputType==Enum.UserInputType.MouseButton1 then
-		dragging=true
-		dragStart=input.Position
-		startPos=frame.Position
+-- animated glow
+task.spawn(function()
+	while true do
+		TweenService:Create(stroke,TweenInfo.new(2),{Transparency=0.2}):Play()
+		task.wait(2)
+		TweenService:Create(stroke,TweenInfo.new(2),{Transparency=0.6}):Play()
+		task.wait(2)
 	end
 end)
 
-UIS.InputEnded:Connect(function(input)
-	if input.UserInputType==Enum.UserInputType.MouseButton1 then
-		dragging=false
+-- title
+local title = Instance.new("TextLabel", main)
+title.Size = UDim2.new(1,0,0,35)
+title.BackgroundTransparency = 1
+title.Text = "🛡 Sprizan Base Protector"
+title.Font = Enum.Font.GothamBold
+title.TextScaled = true
+title.TextColor3 = Color3.fromRGB(210,170,255)
+
+-- discord
+local dc = Instance.new("TextLabel", main)
+dc.Position = UDim2.new(0,0,0,30)
+dc.Size = UDim2.new(1,0,0,18)
+dc.BackgroundTransparency = 1
+dc.Text = "discord.gg/DAA3d7BcPU"
+dc.Font = Enum.Font.Gotham
+dc.TextScaled = true
+dc.TextColor3 = Color3.fromRGB(140,140,140)
+
+-- toggle button
+local toggle = Instance.new("TextButton", main)
+toggle.Size = UDim2.new(0.7,0,0,45)
+toggle.Position = UDim2.new(0.15,0,0.55,0)
+toggle.BackgroundColor3 = Color3.fromRGB(170,0,255)
+toggle.Text = "PROTECTOR: OFF"
+toggle.Font = Enum.Font.GothamBold
+toggle.TextScaled = true
+toggle.TextColor3 = Color3.new(1,1,1)
+Instance.new("UICorner", toggle).CornerRadius = UDim.new(0,12)
+
+------------------------------------------------
+-- DRAG SYSTEM (FIXED)
+------------------------------------------------
+
+local dragging, dragStart, startPos
+
+main.InputBegan:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseButton1 then
+		dragging = true
+		dragStart = input.Position
+		startPos = main.Position
 	end
 end)
 
 UIS.InputChanged:Connect(function(input)
-	if dragging and input.UserInputType==Enum.UserInputType.MouseMovement then
-		local delta=input.Position-dragStart
-		frame.Position=UDim2.new(
+	if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+		local delta = input.Position - dragStart
+		main.Position = UDim2.new(
 			startPos.X.Scale,
-			startPos.X.Offset+delta.X,
+			startPos.X.Offset + delta.X,
 			startPos.Y.Scale,
-			startPos.Y.Offset+delta.Y
+			startPos.Y.Offset + delta.Y
 		)
 	end
 end)
 
--------------------------------------------------
--- TOGGLE LOGIC
--------------------------------------------------
-
-toggle.MouseButton1Click:Connect(function()
-	enabled=not enabled
-
-	if enabled then
-		toggle.Text="ON"
-		toggle.BackgroundColor3=Color3.fromRGB(34,197,94)
-		status.Text="Status: ACTIVE"
-		status.TextColor3=Color3.fromRGB(120,255,160)
-	else
-		toggle.Text="OFF"
-		toggle.BackgroundColor3=Color3.fromRGB(220,38,38)
-		status.Text="Status: OFF"
-		status.TextColor3=Color3.fromRGB(255,80,80)
+UIS.InputEnded:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseButton1 then
+		dragging = false
 	end
 end)
 
--------------------------------------------------
--- ADMIN PANEL HELPERS
--------------------------------------------------
+------------------------------------------------
+-- ADMIN COMMAND EXECUTOR
+------------------------------------------------
 
-local function findPanel()
+local COMMANDS = {
+	"balloon",
+	"ragdoll",
+	"rocket",
+	"jumpscare",
+	"inverse"
+}
+
+local function findAdminPanel()
 	return playerGui:FindFirstChild("AdminPanel")
 end
 
-local function fire(btn)
-	pcall(function()
-		for _,c in pairs(getconnections(btn.MouseButton1Click)) do
-			c:Fire()
-		end
-	end)
-end
-
-local function getCommands()
-	local list={}
-	local panel=findPanel()
-	if not panel then return list end
-
-	for _,v in pairs(panel:GetDescendants()) do
-		if v:IsA("TextButton") then
-			local txt=v.Text:lower()
-			for cmd,_ in pairs(ENABLED_COMMANDS) do
-				if txt:find(cmd) then
-					table.insert(list,v)
-				end
-			end
-		end
+local function click(btn)
+	for _,c in pairs(getconnections(btn.MouseButton1Click)) do
+		c:Fire()
 	end
-	return list
 end
 
-local function findPlayerButton(target)
-	local panel=findPanel()
+local function punishPlayer(target)
+	local panel = findAdminPanel()
 	if not panel then return end
 
 	for _,v in pairs(panel:GetDescendants()) do
-		if v:IsA("TextButton") and
-			(v.Text:find(target.Name) or v.Text:find(target.DisplayName)) then
-			return v
-		end
-	end
-end
+		if v:IsA("TextButton") and v.Text:lower():find(target.Name:lower()) then
+			click(v)
+			task.wait(0.05)
 
--------------------------------------------------
--- ⚡ INSTANT PROTECTION
--------------------------------------------------
-
-local function punish(plr)
-	if cooldown then return end
-	cooldown=true
-
-	task.spawn(function()
-
-		local pbtn=findPlayerButton(plr)
-		if not pbtn then cooldown=false return end
-
-		fire(pbtn)
-
-		local cmds=getCommands()
-		for _,cmd in ipairs(cmds) do
-			fire(cmd) -- instant chain fire
-		end
-
-		task.wait(2)
-		cooldown=false
-	end)
-end
-
--------------------------------------------------
--- DETECT PICKUP (FAST)
--------------------------------------------------
-
-local function watchCharacter(char,plr)
-
-	char.DescendantAdded:Connect(function(obj)
-		if not enabled then return end
-		if plr==player then return end
-
-		if obj:IsA("Tool") then
-			local n=obj.Name:lower()
-
-			if n:find("brain") or n:find("steal") then
-				punish(plr)
+			for _,cmd in pairs(panel:GetDescendants()) do
+				if cmd:IsA("TextButton") then
+					for _,name in pairs(COMMANDS) do
+						if cmd.Text:lower():find(name) then
+							click(cmd)
+							task.wait(0.03)
+						end
+					end
+				end
 			end
+			break
 		end
-	end)
-end
-
-for _,plr in pairs(Players:GetPlayers()) do
-	if plr~=player then
-		if plr.Character then
-			watchCharacter(plr.Character,plr)
-		end
-		plr.CharacterAdded:Connect(function(c)
-			watchCharacter(c,plr)
-		end)
 	end
 end
 
-Players.PlayerAdded:Connect(function(plr)
-	plr.CharacterAdded:Connect(function(c)
-		watchCharacter(c,plr)
-	end)
+------------------------------------------------
+-- STEAL DETECTION (REAL FIX)
+------------------------------------------------
+
+local enabled = false
+
+toggle.MouseButton1Click:Connect(function()
+	enabled = not enabled
+	toggle.Text = enabled and "PROTECTOR: ON" or "PROTECTOR: OFF"
 end)
 
-print("💜 Sprizan Neon Base Protector Loaded")
+task.spawn(function()
+	while true do
+		if enabled then
+			for _,plr in pairs(Players:GetPlayers()) do
+				if plr ~= player and plr.Character then
+					for _,tool in pairs(plr.Character:GetChildren()) do
+						if tool:IsA("Tool") then
+							-- brainrot detected
+							punishPlayer(plr)
+						end
+					end
+				end
+			end
+		end
+		task.wait(0.15) -- instant reaction
+	end
+end)

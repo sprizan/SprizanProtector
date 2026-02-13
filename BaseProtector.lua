@@ -1,90 +1,130 @@
---// 🛡️ SPRIZAN BASE PROTECTOR (GOD++ VERSION)
---// Copypaste Ready
+--🛡️ SPRIZAN BASE PROTECTOR GOD++
 
 local Players = game:GetService("Players")
 local UIS = game:GetService("UserInputService")
 local TweenService = game:GetService("TweenService")
 
 local player = Players.LocalPlayer
-local playerGui = player:WaitForChild("PlayerGui")
 
 --------------------------------------------------
 -- GUI
 --------------------------------------------------
 
-local gui = Instance.new("ScreenGui", playerGui)
-gui.Name = "SprizanBaseProtector"
+local gui = Instance.new("ScreenGui", player.PlayerGui)
 gui.ResetOnSpawn = false
+gui.Name = "SprizanProtector"
+
+--------------------------------------------------
+-- OPEN BUTTON
+--------------------------------------------------
+
+local open = Instance.new("TextButton", gui)
+open.Size = UDim2.new(0,60,0,60)
+open.Position = UDim2.new(0,20,0.5,-30)
+open.Text="🛡️"
+open.TextScaled=true
+open.BackgroundColor3=Color3.fromRGB(140,0,255)
+Instance.new("UICorner",open).CornerRadius=UDim.new(0,14)
+
+--------------------------------------------------
+-- MAIN FRAME
+--------------------------------------------------
 
 local main = Instance.new("Frame", gui)
-main.Size = UDim2.new(0,300,0,150)
-main.Position = UDim2.new(0.5,-150,0.5,-75)
-main.BackgroundColor3 = Color3.fromRGB(15,15,20)
-main.BorderSizePixel = 0
+main.Size = UDim2.new(0,300,0,170)
+main.Position = UDim2.new(.5,-150,.5,-85)
+main.Visible=false
+main.BackgroundColor3=Color3.fromRGB(15,15,20)
+Instance.new("UICorner",main)
 
-Instance.new("UICorner",main).CornerRadius=UDim.new(0,12)
+local stroke=Instance.new("UIStroke",main)
+stroke.Color=Color3.fromRGB(170,80,255)
+stroke.Thickness=2
 
-local stroke = Instance.new("UIStroke",main)
-stroke.Color = Color3.fromRGB(170,80,255)
-stroke.Thickness = 2
+-- animated neon
+task.spawn(function()
+	while true do
+		TweenService:Create(stroke,TweenInfo.new(1.5),{
+			Color=Color3.fromRGB(210,120,255)
+		}):Play()
+		task.wait(1.5)
+		TweenService:Create(stroke,TweenInfo.new(1.5),{
+			Color=Color3.fromRGB(170,80,255)
+		}):Play()
+		task.wait(1.5)
+	end
+end)
 
+--------------------------------------------------
 -- TITLE
-local title = Instance.new("TextLabel",main)
-title.Size = UDim2.new(1,0,0,40)
+--------------------------------------------------
+
+local title=Instance.new("TextLabel",main)
+title.Size=UDim2.new(1,0,0,40)
 title.BackgroundTransparency=1
 title.Text="🛡️ Sprizan Base Protector"
 title.Font=Enum.Font.GothamBold
-title.TextSize=16
+title.TextScaled=true
 title.TextColor3=Color3.new(1,1,1)
 
--- DISCORD
-local dc = Instance.new("TextLabel",main)
-dc.Position=UDim2.new(0,0,0,32)
+local dc=Instance.new("TextLabel",main)
+dc.Position=UDim2.new(0,0,0,35)
 dc.Size=UDim2.new(1,0,0,20)
 dc.BackgroundTransparency=1
 dc.Text="discord.gg/DAA3d7BcPU"
+dc.TextScaled=true
 dc.Font=Enum.Font.Gotham
-dc.TextSize=12
-dc.TextColor3=Color3.fromRGB(200,170,255)
+dc.TextColor3=Color3.fromRGB(170,140,255)
 
 --------------------------------------------------
--- TOGGLE BUTTON
+-- TOGGLE
 --------------------------------------------------
 
-local toggle = Instance.new("TextButton",main)
-toggle.Size=UDim2.new(0,140,0,40)
-toggle.Position=UDim2.new(0.5,-70,0.5,-10)
-toggle.Text="PROTECT: OFF"
-toggle.Font=Enum.Font.GothamBold
-toggle.TextSize=14
+local enabled=false
+
+local toggle=Instance.new("TextButton",main)
+toggle.Size=UDim2.new(.7,0,0,45)
+toggle.Position=UDim2.new(.15,0,.55,0)
+toggle.Text="PROTECT OFF"
+toggle.TextScaled=true
 toggle.BackgroundColor3=Color3.fromRGB(40,40,50)
-toggle.TextColor3=Color3.new(1,1,1)
+Instance.new("UICorner",toggle)
 
-Instance.new("UICorner",toggle).CornerRadius=UDim.new(0,8)
+toggle.MouseButton1Click:Connect(function()
+	enabled=not enabled
+	toggle.Text=enabled and "PROTECT ON" or "PROTECT OFF"
+	toggle.BackgroundColor3=enabled
+		and Color3.fromRGB(140,0,255)
+		or Color3.fromRGB(40,40,50)
+end)
 
 --------------------------------------------------
--- DRAGGABLE
+-- MOBILE DRAG (REAL)
 --------------------------------------------------
 
 local dragging=false
 local dragStart,startPos
 
 main.InputBegan:Connect(function(input)
-	if input.UserInputType==Enum.UserInputType.MouseButton1 then
+	if input.UserInputType==Enum.UserInputType.Touch
+	or input.UserInputType==Enum.UserInputType.MouseButton1 then
 		dragging=true
 		dragStart=input.Position
 		startPos=main.Position
-	end
-end)
 
-UIS.InputEnded:Connect(function(input)
-	if input.UserInputType==Enum.UserInputType.MouseButton1 then
-		dragging=false
+		input.Changed:Connect(function()
+			if input.UserInputState==Enum.UserInputState.End then
+				dragging=false
+			end
+		end)
 	end
 end)
 
 UIS.InputChanged:Connect(function(input)
-	if dragging and input.UserInputType==Enum.UserInputType.MouseMovement then
+	if dragging and (
+		input.UserInputType==Enum.UserInputType.Touch
+		or input.UserInputType==Enum.UserInputType.MouseMovement) then
+
 		local delta=input.Position-dragStart
 		main.Position=UDim2.new(
 			startPos.X.Scale,
@@ -96,134 +136,77 @@ UIS.InputChanged:Connect(function(input)
 end)
 
 --------------------------------------------------
--- NEON ANIMATION
+-- OPEN/CLOSE
 --------------------------------------------------
 
-task.spawn(function()
-	while true do
-		TweenService:Create(
-			stroke,
-			TweenInfo.new(1.2),
-			{Color=Color3.fromRGB(200,120,255)}
-		):Play()
-		task.wait(1.2)
-		TweenService:Create(
-			stroke,
-			TweenInfo.new(1.2),
-			{Color=Color3.fromRGB(140,60,255)}
-		):Play()
-		task.wait(1.2)
-	end
+open.MouseButton1Click:Connect(function()
+	main.Visible=not main.Visible
 end)
 
 --------------------------------------------------
--- ALERT EFFECT
+-- ADMIN PANEL SCANNER (SMART)
 --------------------------------------------------
 
-local function alert()
-	local flash=Instance.new("Frame",gui)
-	flash.Size=UDim2.new(1,0,1,0)
-	flash.BackgroundColor3=Color3.fromRGB(170,0,255)
-	flash.BackgroundTransparency=0.7
-	
-	TweenService:Create(
-		flash,
-		TweenInfo.new(.4),
-		{BackgroundTransparency=1}
-	):Play()
-	
-	game:GetService("Debris"):AddItem(flash,.4)
+local COMMANDS={"balloon","ragdoll","rocket","jumpscare","inverse"}
+
+local function spamAdmin()
+	for _,v in pairs(game:GetDescendants()) do
+		if v:IsA("TextButton") then
+			local txt=(v.Text or ""):lower()
+
+			for _,cmd in pairs(COMMANDS) do
+				if txt:find(cmd) then
+					pcall(function()
+						for _,c in pairs(getconnections(v.MouseButton1Click)) do
+							c:Fire()
+						end
+					end)
+				end
+			end
+		end
+	end
 end
 
 --------------------------------------------------
--- ADMIN SPAM CORE
+-- INSTANT STEAL DETECTOR
 --------------------------------------------------
 
-local TARGET_COMMANDS={
-	"balloon",
-	"ragdoll",
-	"rocket",
-	"jumpscare",
-	"inverse"
-}
+local function watchCharacter(char,plr)
+	char.ChildAdded:Connect(function(obj)
 
-local function findAdminPanel()
-	return playerGui:FindFirstChild("AdminPanel",true)
-end
+		if not enabled then return end
 
-local function click(btn)
-	pcall(function()
-		for _,c in pairs(getconnections(btn.MouseButton1Click)) do
-			c:Fire()
+		local n=obj.Name:lower()
+
+		-- detects carried brainrot objects
+		if obj:IsA("Model") or obj:IsA("Part") then
+			if n:find("brain") or n:find("steal") then
+
+				-- instant spam burst
+				for i=1,6 do
+					spamAdmin()
+					task.wait(0.15)
+				end
+			end
 		end
 	end)
 end
 
-local function spamPlayer(target)
-	local panel=findAdminPanel()
-	if not panel then return end
-	
-	local playerBtn=nil
-	
-	for _,v in pairs(panel:GetDescendants()) do
-		if v:IsA("TextButton") and v.Text:find(target.Name) then
-			playerBtn=v
-			break
+for _,plr in pairs(Players:GetPlayers()) do
+	if plr~=player then
+		if plr.Character then
+			watchCharacter(plr.Character,plr)
 		end
-	end
-	
-	if not playerBtn then return end
-	
-	click(playerBtn)
-	task.wait(.01)
-	
-	for _,v in pairs(panel:GetDescendants()) do
-		if v:IsA("TextButton") then
-			local txt=v.Text:lower()
-			for _,cmd in pairs(TARGET_COMMANDS) do
-				if txt:find(cmd) then
-					click(v)
-					task.wait(.01)
-				end
-			end
-		end
+		plr.CharacterAdded:Connect(function(c)
+			watchCharacter(c,plr)
+		end)
 	end
 end
 
---------------------------------------------------
--- STEAL DETECTOR (FAST LOOP)
---------------------------------------------------
-
-local enabled=false
-
-toggle.MouseButton1Click:Connect(function()
-	enabled=not enabled
-	
-	toggle.Text=enabled and "PROTECT: ON" or "PROTECT: OFF"
-	toggle.BackgroundColor3=enabled
-		and Color3.fromRGB(120,40,255)
-		or Color3.fromRGB(40,40,50)
-end)
-
-task.spawn(function()
-	while true do
-		task.wait(.15) -- ultra fast scan
-		
-		if not enabled then continue end
-		
-		for _,plr in pairs(Players:GetPlayers()) do
-			if plr~=player and plr.Character then
-				
-				-- detect grabbing animation/tools
-				local tool=plr.Character:FindFirstChildOfClass("Tool")
-				
-				if tool then
-					alert()
-					spamPlayer(plr)
-				end
-			end
-		end
-	end
+Players.PlayerAdded:Connect(function(plr)
+	plr.CharacterAdded:Connect(function(c)
+		watchCharacter(c,plr)
+	end)
 end)
 
 print("🛡️ Sprizan Base Protector Loaded")
